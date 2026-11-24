@@ -1,64 +1,58 @@
 import { useState } from "react";
 import Results from "./results";
+import { createInitialAnswers } from "../utils/quiz";
+
+const QUESTION_BANK = [
+  {
+    question: "What is the capital of France?",
+    options: ["Berlin", "Madrid", "Paris", "Rome"],
+    answer: "Paris",
+  },
+  {
+    question: "Which planet is known as the Red Planet?",
+    options: ["Earth", "Mars", "Jupiter", "Venus"],
+    answer: "Mars",
+  },
+  {
+    question: "What is the largest ocean on Earth?",
+    options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+    answer: "Pacific Ocean",
+  },
+];
 
 function Quiz() {
-  const questionBank = [
-    {
-      question: "What is the capital of France?",
-      options: ["Berlin", "Madrid", "Paris", "Rome"],
-      answer: "Paris",
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Earth", "Mars", "Jupiter", "Venus"],
-      answer: "Mars",
-    },
-    {
-      question: "What is the largest ocean on Earth?",
-      options: [
-        "Atlantic Ocean",
-        "Indian Ocean",
-        "Arctic Ocean",
-        "Pacific Ocean",
-      ],
-      answer: "Pacific Ocean",
-    },
-  ];
-
-  const initialAnswers = [null, null, null];
-
-  const [userAnswers, setUserAnswers] = useState(initialAnswers);
-
+  const [userAnswers, setUserAnswers] = useState(() => createInitialAnswers(QUESTION_BANK.length));
   const [currentQuestion, setCurrentQuestion] = useState(0);
-
   const [isQuizFinished, setIsQuizFinished] = useState(false);
 
+  const question = QUESTION_BANK[currentQuestion];
   const selectedAnswer = userAnswers[currentQuestion];
 
   function handleSelectOption(option) {
-    const newUserAnswers = [...userAnswers];
-
-    newUserAnswers[currentQuestion] = option;
-
-    setUserAnswers(newUserAnswers);
+    setUserAnswers((answers) => {
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentQuestion] = option;
+      return updatedAnswers;
+    });
   }
 
   function goToNext() {
-    if (currentQuestion === questionBank.length - 1) {
+    if (!selectedAnswer) return;
+
+    if (currentQuestion === QUESTION_BANK.length - 1) {
       setIsQuizFinished(true);
-    } else {
-      setCurrentQuestion(currentQuestion + 1);
+      return;
     }
+
+    setCurrentQuestion((index) => Math.min(index + 1, QUESTION_BANK.length - 1));
   }
 
   function goToPrevious() {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
+    setCurrentQuestion((index) => Math.max(index - 1, 0));
   }
 
   function restartQuiz() {
-    setUserAnswers(initialAnswers);
+    setUserAnswers(createInitialAnswers(QUESTION_BANK.length));
     setCurrentQuestion(0);
     setIsQuizFinished(false);
   }
@@ -67,39 +61,49 @@ function Quiz() {
     return (
       <Results
         userAnswers={userAnswers}
-        questionBank={questionBank}
+        questionBank={QUESTION_BANK}
         restartQuiz={restartQuiz}
       />
     );
   }
 
   return (
-    <div>
-      <h2>Question {currentQuestion + 1}</h2>
-      <p className="question">{questionBank[currentQuestion].question}</p>
+    <section aria-labelledby="question-title">
+      <p aria-live="polite">
+        Question {currentQuestion + 1} of {QUESTION_BANK.length}
+      </p>
+      <progress
+        value={currentQuestion + 1}
+        max={QUESTION_BANK.length}
+        aria-label="Quiz progress"
+      />
+      <h2 id="question-title">{question.question}</h2>
 
-      {questionBank[currentQuestion].options.map((option) => (
-        <button
-          className={"option" + (selectedAnswer === option ? " selected" : "")}
-          onClick={() => handleSelectOption(option)}
-          key={option}
-        >
-          {" "}
-          {option}{" "}
-        </button>
-      ))}
+      <div role="group" aria-label="Answer options">
+        {question.options.map((option) => (
+          <button
+            type="button"
+            className={"option" + (selectedAnswer === option ? " selected" : "")}
+            onClick={() => handleSelectOption(option)}
+            aria-pressed={selectedAnswer === option}
+            key={option}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
 
-      <p>Selected Option: {}</p>
+      <p aria-live="polite">Selected option: {selectedAnswer ?? "None"}</p>
 
       <div className="nav-buttons">
-        <button onClick={goToPrevious} disabled={currentQuestion == 0}>
+        <button type="button" onClick={goToPrevious} disabled={currentQuestion === 0}>
           Previous
         </button>
-        <button onClick={goToNext} disabled={!selectedAnswer}>
-          {currentQuestion === questionBank.length - 1 ? "Finish Quiz" : "Next"}
+        <button type="button" onClick={goToNext} disabled={!selectedAnswer}>
+          {currentQuestion === QUESTION_BANK.length - 1 ? "Finish Quiz" : "Next"}
         </button>
       </div>
-    </div>
+    </section>
   );
 }
 
