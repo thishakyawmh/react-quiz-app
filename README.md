@@ -1,16 +1,39 @@
-# React + Vite
+# React Quiz App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small interactive quiz built with React and Vite. It demonstrates component composition, controlled state, question navigation, answer selection, and score calculation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Multiple-choice questions
+- Select and revise an answer before moving on
+- Previous/Next navigation with unanswered-question protection
+- Progress indicator and accessible selected-state feedback
+- Results summary and quiz restart
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- Vite 7
+- JavaScript (ES modules)
+- Node.js built-in test runner
 
-## Expanding the ESLint configuration
+## Local setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm ci
+npm run dev
+```
+
+## Quality checks
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+The score calculation and initial-answer helpers are kept separate from the UI so they can be tested without rendering React components.
+
+## Scope
+
+This is a frontend learning project. Questions are stored in the client bundle; there is no backend, account system, database, or server-side score validation. Do not use it for high-stakes assessments without a trusted server-side question bank and scoring service.
