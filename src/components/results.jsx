@@ -1,27 +1,23 @@
+import { calculateScore } from "../utils/quiz";
+
 function Results({ userAnswers, questionBank, restartQuiz }) {
-  function getScore() {
-    let finalscore = 0;
-
-    userAnswers.forEach((answer, index) => {
-      if (answer === questionBank[index].answer) {
-        finalscore++;
-      }
-    });
-    return finalscore;
-  }
-
-  const score = getScore();
+  const score = calculateScore(userAnswers, questionBank);
 
   return (
-    <div>
-      <h2>Quiz Completed!</h2>
+    <section aria-labelledby="results-title">
+      <h2 id="results-title">Quiz Completed!</h2>
       <p>
         Your Score: {score}/{questionBank.length}
       </p>
-      <button className="restart-button" onClick={restartQuiz}>
+      <p>
+        {score === questionBank.length
+          ? "Excellent work! You answered every question correctly."
+          : "Good effort. Review the answers and try again."}
+      </p>
+      <button type="button" className="restart-button" onClick={restartQuiz}>
         Retake Quiz
       </button>
-    </div>
+    </section>
   );
 }
 
